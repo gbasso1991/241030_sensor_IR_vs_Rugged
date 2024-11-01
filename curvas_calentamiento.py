@@ -58,15 +58,11 @@ def lector_templog_raytec(directorio):
     
     return t, temp_CH1
 
-
-path_test=os.path.join(os.getcwd(),'10-30-24_4-37-23_pm_Logfile.txt')
-
-time,Temp=lector_templog_raytec(path_test)
-plt.plot(time,Temp)
 #%% 
 paths_IR = glob(os.path.join('*.txt'))
+paths_IR.sort()
 paths_Rugged = glob(os.path.join('*.csv'))
-
+paths_Rugged.sort()
 t_IR_1,T_IR_1=lector_templog_raytec(paths_IR[0])
 t_IR_2,T_IR_2=lector_templog_raytec(paths_IR[1])
 t_IR_3,T_IR_3=lector_templog_raytec(paths_IR[2])
@@ -106,7 +102,7 @@ t_Rugged_3-=t_Rugged_3[0]
 T_Rugged_3=T_Rugged_3[indx_max_Rugged_3[0][0]:]
 
 # %% 2x1
-fig,(ax,ax1)=plt.subplots(nrows=2,figsize=(10,8),constrained_layout=True)
+fig,(ax,ax1)=plt.subplots(nrows=2,figsize=(10,8),constrained_layout=True,sharex=True,sharey=True)
 ax.plot(t_Rugged_1,T_Rugged_1,'.-',label='Rugged_1')
 ax.plot(t_Rugged_2,T_Rugged_2,'.-',label='Rugged_2')
 ax.plot(t_Rugged_3,T_Rugged_3,'.-',label='Rugged_3')
@@ -126,7 +122,7 @@ plt.savefig('Rugged_vs_Raytec.png',dpi=300)
 plt.show()
 
 #%% 3x1
-fig,(ax,ax1,ax2)=plt.subplots(nrows=3,figsize=(10,12),constrained_layout=True,sharex=True)
+fig,(ax,ax1,ax2)=plt.subplots(nrows=3,figsize=(10,12),constrained_layout=True,sharex=True,sharey=True)
 ax.plot(t_IR_1,T_IR_1,'.-',label='IR_1')
 ax.plot(t_Rugged_1,T_Rugged_1,'.-',label='Rugged_1')
 
@@ -148,29 +144,29 @@ plt.show()
 # %% interpolo para restar 
 
 t_max_common_1 = min(t_IR_1[-1], t_Rugged_1[-1])
-indices_IR = np.where(t_IR_1 <= t_max_common_1)
-t_IR_1_recortado = t_IR_1[indices_IR]
-T_IR_1_recortado = T_IR_1[indices_IR]
-indices_Rugged = np.where(t_Rugged_1 <= t_max_common_1)
-t_Rugged_1_recortado = t_Rugged_1[indices_Rugged]
-T_Rugged_1_recortado = T_Rugged_1[indices_Rugged]
+indices_IR_1 = np.where(t_IR_1 <= t_max_common_1)
+t_IR_1_recortado = t_IR_1[indices_IR_1]
+T_IR_1_recortado = T_IR_1[indices_IR_1]
+indices_Rugged_1 = np.where(t_Rugged_1 <= t_max_common_1)
+t_Rugged_1_recortado = t_Rugged_1[indices_Rugged_1]
+T_Rugged_1_recortado = T_Rugged_1[indices_Rugged_1]
 
 t_max_common_2 = min(t_IR_2[-1], t_Rugged_2[-1])
-indices_IR = np.where(t_IR_2 <= t_max_common_2)
-t_IR_2_recortado = t_IR_2[indices_IR]
-T_IR_2_recortado = T_IR_2[indices_IR]
-indices_Rugged = np.where(t_Rugged_2 <= t_max_common_2)
-t_Rugged_2_recortado = t_Rugged_2[indices_Rugged]
-T_Rugged_2_recortado = T_Rugged_2[indices_Rugged]
+indices_IR_2 = np.where(t_IR_2 <= t_max_common_2)
+t_IR_2_recortado = t_IR_2[indices_IR_2]
+T_IR_2_recortado = T_IR_2[indices_IR_2]
+indices_Rugged_2 = np.where(t_Rugged_2 <= t_max_common_2)
+t_Rugged_2_recortado = t_Rugged_2[indices_Rugged_2]
+T_Rugged_2_recortado = T_Rugged_2[indices_Rugged_2]
 
 t_max_common_3 = min(t_IR_3[-1], t_Rugged_3[-1])
-indices_IR = np.where(t_IR_3 <= t_max_common_3)
-t_IR_3_recortado = t_IR_3[indices_IR]
-T_IR_3_recortado = T_IR_3[indices_IR]
-indices_Rugged = np.where(t_Rugged_3 <= t_max_common_3)
-t_Rugged_3_recortado = t_Rugged_3[indices_Rugged]
-T_Rugged_3_recortado = T_Rugged_3[indices_Rugged]
-
+indices_IR_3 = np.where(t_IR_3 <= t_max_common_3)
+t_IR_3_recortado = t_IR_3[indices_IR_3]
+T_IR_3_recortado = T_IR_3[indices_IR_3]
+indices_Rugged_3 = np.where(t_Rugged_3 <= t_max_common_3)
+t_Rugged_3_recortado = t_Rugged_3[indices_Rugged_3]
+T_Rugged_3_recortado = T_Rugged_3[indices_Rugged_3]
+#%%
 fig,(ax,ax1,ax2)=plt.subplots(nrows=3,figsize=(10,12),constrained_layout=True,sharex=True)
 ax.plot(t_IR_1_recortado,T_IR_1_recortado,'.-',label='IR_1')
 ax.plot(t_Rugged_1_recortado,T_Rugged_1_recortado,'.-',label='Rugged_1')
@@ -189,8 +185,63 @@ for a in [ax,ax1,ax2]:
 ax2.set_xlabel('t (s)')
 # plt.savefig('sar_vs_Temp.png',dpi=300)
 plt.show()
+#%% Interpolcion
+
+interp_func_1 = PchipInterpolator(t_Rugged_1_recortado,T_Rugged_1_recortado)
+T_rugged_interp_1 = interp_func_1(t_IR_1_recortado)
+
+interp_func_2 = PchipInterpolator(t_Rugged_2_recortado,T_Rugged_2_recortado)
+T_rugged_interp_2 = interp_func_2(t_IR_2_recortado)
+
+interp_func_3 = PchipInterpolator(t_Rugged_3_recortado,T_Rugged_3_recortado)
+T_rugged_interp_3 = interp_func_3(t_IR_3_recortado)
+
+
+resta_1 = T_IR_1_recortado-T_rugged_interp_1 
+resta_2 = T_rugged_interp_2 - T_IR_2_recortado
+resta_3 = T_rugged_interp_3 - T_IR_3_recortado
+
+
+fig,(ax,ax1,ax2)=plt.subplots(nrows=3,figsize=(15,12),constrained_layout=True,sharex=True)
+ax.plot(t_IR_1_recortado,T_IR_1_recortado,'.-',label='IR_1')
+ax.plot(t_Rugged_1_recortado,T_Rugged_1_recortado,'.-',label='Rugged_1')
+axin = ax.inset_axes([0.4, 0.2, 0.59, 0.78])
+axin.plot(t_IR_1_recortado,resta_1,'.-',label='Resta 1')
+
+ax1.plot(t_IR_2_recortado,T_IR_2_recortado,'.-',label='IR_2')
+ax1.plot(t_Rugged_2_recortado,T_Rugged_2_recortado,'.-',label='Rugged_2')
+axin1 = ax1.inset_axes([0.4, 0.24, 0.59, 0.74])
+
+axin1.plot(t_IR_2_recortado,resta_2,'.-',label='Resta 2')
+
+ax2.plot(t_IR_3_recortado,T_IR_3_recortado,'.-',label='IR_3')
+ax2.plot(t_Rugged_3_recortado,T_Rugged_3_recortado,'.-',label='Rugged_3')
+axin2 = ax2.inset_axes([0.4, 0.28, 0.59, 0.7])
+axin2.plot(t_IR_3_recortado,resta_3,'.-',label='Resta 3')
+
+ax.set_title('Comparativa sensores',loc='left')
+for a in [ax,ax1,ax2]:
+    a.grid()
+    a.set_ylabel('T (°C)')
+    a.legend(loc='lower left')
+for a in [axin,axin1,axin2]:
+    a.grid()
+    a.set_ylabel('T (°C)')
+    a.legend(loc='upper right')   
+    
+ax2.set_xlabel('t (s)')
+plt.savefig('Comparativa_sensores_temperatura.png',dpi=300)
+plt.show()
 #%%
 
-interp_func = PchipInterpolator(t_full, T_full)
-        t_interp = np.round(np.arange(t_full[indx_1er_dato], t_full[indx_ultimo_dato] + 1.01, 0.01), 2)
-        T_interp = np.round(interp_func(t_interp), 2)
+fig,ax=plt.subplots(nrows=1,figsize=(10,5),constrained_layout=True,sharex=True)
+ax.plot(T_IR_1_recortado[::-1],resta_1,'.-',label='IR - Rugged')
+
+ax.plot(T_IR_2_recortado[::-1],resta_2,'.-',label='Rugged - IR')
+ax.plot(T_IR_3_recortado[::-1],resta_3,'.-',label='Rugged - IR')
+ax.grid()
+ax.set_ylabel('$\Delta$T (°C)')
+ax.legend()   
+ax.set_title('$\Delta$T entre sensores vs T ')
+ax.set_xlabel('T (°C)')
+plt.savefig('Comparativa_sensores_temperatura_2.png',dpi=300)
